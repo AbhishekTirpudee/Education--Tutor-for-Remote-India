@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import axios from 'axios';
+import { TutorAPI } from '../services/api';
 import { Textbook, GlobalMetrics } from '../types';
 
 interface SidebarProps {
@@ -32,9 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     
     setIsUploading(true);
     try {
-      await axios.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await TutorAPI.uploadTextbook(file);
       showToast('Textbook processed & chunked successfully!', 'success');
       onUploadSuccess();
     } catch (err: any) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { TutorAPI } from './services/api';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { ChatBox } from './components/ChatBox';
@@ -25,18 +25,18 @@ function App() {
 
   const fetchBooks = async () => {
     try {
-      const res = await axios.get('/api/textbooks');
-      setTextbooks(res.data);
-      if (res.data.length > 0 && !selectedBookId) {
-        setSelectedBookId(res.data[0].id);
+      const data = await TutorAPI.fetchBooks();
+      setTextbooks(data);
+      if (data.length > 0 && !selectedBookId) {
+        setSelectedBookId(data[0].id);
       }
     } catch (e) { console.error('Failed to fetch books', e); }
   };
 
   const fetchMetrics = async () => {
     try {
-      const res = await axios.get('/api/metrics');
-      setGlobalMetrics(res.data);
+      const data = await TutorAPI.fetchMetrics();
+      setGlobalMetrics(data);
     } catch (e) { console.error('Failed to fetch metrics', e); }
   };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { TutorAPI } from '../services/api';
 import { PruningMetrics } from '../types';
 
 interface ChatBoxProps {
@@ -30,13 +30,10 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
     setAnswer('');
 
     try {
-      const res = await axios.post('/api/ask', {
-        question,
-        textbookId: selectedBookId || undefined
-      });
+      const data = await TutorAPI.askQuestion(question, selectedBookId);
       
-      setAnswer(res.data.answer);
-      onNewMetrics(res.data.pruningMetrics, res.data.selectedChunks, res.data.latencyMs);
+      setAnswer(data.answer);
+      onNewMetrics(data.pruningMetrics, data.selectedChunks, data.latencyMs);
       onRefreshGlobalStats();
     } catch (err: any) {
       setAnswer(`❌ Error: ${err.response?.data?.error || err.message}`);

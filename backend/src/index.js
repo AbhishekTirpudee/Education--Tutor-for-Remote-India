@@ -14,6 +14,7 @@ const hpp = require("hpp");
 const xss = require("xss-clean");
 const tutorRouter = require("./routes/tutor");
 const uploadRouter = require("./routes/upload");
+const { errorHandler, notFoundHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3001", 10);
@@ -47,6 +48,10 @@ app.get("/api/health", (req, res) => {
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use("/api", tutorRouter);
 app.use("/api", uploadRouter);
+
+// ── Error Handling ────────────────────────────────────────────────────────────
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
