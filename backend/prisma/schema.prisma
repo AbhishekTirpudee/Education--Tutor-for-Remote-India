@@ -1,0 +1,82 @@
+// This is your Prisma schema file
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Models ────────────────────────────────────────────────────────────────────
+
+model Textbook {
+  id          Int      @id @default(autoincrement())
+  filename    String
+  subject     String?
+  grade       String?
+  totalPages  Int      @default(0)
+  totalChunks Int      @default(0)
+  filePath    String
+  createdAt   DateTime @default(now())
+
+  chunks  TextChunk[]
+  queries QueryLog[]
+}
+
+model TextChunk {
+  id         Int     @id @default(autoincrement())
+  textbookId Int
+  chunkIndex Int
+  pageNumber Int?
+  chapter    String?
+  content    String
+  tokenCount Int     @default(0)
+  // Stored as JSON string of float[]
+  embedding  String?
+
+  textbook Textbook @relation(fields: [textbookId], references: [id], onDelete: Cascade)
+}
+
+model QueryLog {
+  id         Int      @id @default(autoincrement())
+  textbookId Int?
+  question   String
+  answer     String?
+
+  // Pruning metrics
+  totalChunks     Int?
+  prunedChunks    Int?
+  reductionPct    Float?   // e.g. 78.4
+
+  // Token metrics
+  baselineTokens  Int?
+  prunedTokens    Int?
+  tokensSaved     Int?
+
+  // Cost metrics (USD)
+  baselineCostUsd Float?
+  actualCostUsd   Float?
+  costSavedUsd    Float?
+
+  // Latency ms
+  latencyMs Float?
+
+  createdAt DateTime @default(now())
+
+  textbook Textbook? @relation(fields: [textbookId], references: [id])
+}
+
+model TutoringSession {
+  id           String   @id @default(uuid())
+  studentName  String?
+  grade        String?
+  subject      String?
+  startedAt    DateTime @default(now())
+  totalQueries Int      @default(0)
+  totalCostUsd Float    @default(0)
+  tokensSaved  Int      @default(0)
+  isActive     Boolean  @default(true)
+}
