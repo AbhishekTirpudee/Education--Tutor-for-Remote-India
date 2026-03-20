@@ -9,7 +9,7 @@
 Personalized AI tutors are revolutionizing education, but they are expensive to run. In rural India, where internet is spotty and computing power is low, students cannot afford high-latency, high-cost queries to massive models for every question.
 
 ## 🚀 Our Solution
-An intelligent tutoring system utilizing a full-stack TypeScript architecture (React + Node.js) that:
+An intelligent tutoring system utilizing a full-stack architecture (React + Node.js) that:
 1. Ingests state-board textbooks (PDFs)
 2. Uses **TF-IDF Context Pruning** to strip irrelevant chapters before LLM calls
 3. Answers curriculum-aligned questions with **significantly reduced API costs** (~78% reduction)
@@ -21,7 +21,7 @@ An intelligent tutoring system utilizing a full-stack TypeScript architecture (R
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 18, Vite, TypeScript, Vanilla CSS |
-| **Backend** | Node.js, Express.js, TypeScript |
+| **Backend** | Node.js, Express.js, JavaScript |
 | **Database/ORM** | SQLite + Prisma |
 | **PDF Processing** | pdf-parse |
 | **Pruning Engine** | `natural` (TF-IDF Cosine Similarity) |

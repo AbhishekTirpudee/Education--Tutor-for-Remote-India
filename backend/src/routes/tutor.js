@@ -1,33 +1,26 @@
 /**
  * Tutor Routes
  * ============
- * POST /api/ask — Student asks a question; context is pruned before LLM call
- * GET  /api/metrics — Aggregated savings metrics
- * GET  /api/history — Query history
  */
 
-import { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import { pruneContext } from "../services/contextPruner";
-import { askLLM } from "../services/llmService";
+const express = require("express");
+const { PrismaClient } = require("@prisma/client");
+const { pruneContext } = require("../services/contextPruner");
+const { askLLM } = require("../services/llmService");
 
-const router = Router();
+const router = express.Router();
 const prisma = new PrismaClient();
 
 // POST /api/ask
-router.post("/ask", async (req: Request, res: Response) => {
+router.post("/ask", async (req, res) => {
   try {
-    const { question, textbookId } = req.body as {
-      question: string;
-      textbookId?: number;
-    };
+    const { question, textbookId } = req.body;
 
     if (!question || question.trim().length < 3) {
       return res.status(400).json({ error: "Question is required (min 3 chars)" });
     }
 
-    // Fetch all chunks for this textbook (or all chunks if no textbookId)
-    const whereClause = textbookId ? { textbookId } : {};
+    const whereClause = textbookId ? { textbookId: parseInt(textbookId, 10) } : {};
     const dbChunks = await prisma.textChunk.findMany({
       where: whereClause,
       orderBy: { chunkIndex: "asc" },
@@ -35,20 +28,18 @@ router.post("/ask", async (req: Request, res: Response) => {
 
     const allChunkTexts = dbChunks.map((c) => c.content);
 
-    // ── CONTEXT PRUNING (THE KEY TECHNIQUE) ──────────────────────────────────
+    // ── CONTEXT PRUNING ──────────────────────────────────────────────────────
     const { prunedChunks, selectedIndices, metrics } = pruneContext(
       question,
       allChunkTexts
     );
     // ─────────────────────────────────────────────────────────────────────────
 
-    // Send only pruned context to LLM
     const llmResult = await askLLM(question, prunedChunks);
 
-    // Persist query log
     const log = await prisma.queryLog.create({
       data: {
-        textbookId: textbookId ?? null,
+        textbookId: textbookId ? parseInt(textbookId, 10) : null,
         question,
         answer: llmResult.answer,
         totalChunks: metrics.totalChunks,
@@ -77,8 +68,8 @@ router.post("/ask", async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/metrics — Cumulative savings dashboard data
-router.get("/metrics", async (_req: Request, res: Response) => {
+// GET /api/metrics
+router.get("/metrics", async (req, res) => {
   try {
     const agg = await prisma.queryLog.aggregate({
       _sum: {
@@ -96,20 +87,20 @@ router.get("/metrics", async (_req: Request, res: Response) => {
 
     return res.json({
       totalQueries: agg._count.id,
-      totalTokensSaved: agg._sum.tokensSaved ?? 0,
-      totalCostSavedUsd: parseFloat((agg._sum.costSavedUsd ?? 0).toFixed(6)),
-      avgReductionPct: parseFloat((agg._avg.reductionPct ?? 0).toFixed(2)),
-      avgLatencyMs: parseFloat((agg._avg.latencyMs ?? 0).toFixed(2)),
-      totalBaselineTokens: agg._sum.baselineTokens ?? 0,
-      totalPrunedTokens: agg._sum.prunedTokens ?? 0,
+      totalTokensSaved: agg._sum.tokensSaved || 0,
+      totalCostSavedUsd: parseFloat((agg._sum.costSavedUsd || 0).toFixed(6)),
+      avgReductionPct: parseFloat((agg._avg.reductionPct || 0).toFixed(2)),
+      avgLatencyMs: parseFloat((agg._avg.latencyMs || 0).toFixed(2)),
+      totalBaselineTokens: agg._sum.baselineTokens || 0,
+      totalPrunedTokens: agg._sum.prunedTokens || 0,
     });
   } catch (err) {
     return res.status(500).json({ error: String(err) });
   }
 });
 
-// GET /api/history — Recent queries
-router.get("/history", async (_req: Request, res: Response) => {
+// GET /api/history
+router.get("/history", async (req, res) => {
   try {
     const logs = await prisma.queryLog.findMany({
       orderBy: { createdAt: "desc" },
@@ -131,4 +122,4 @@ router.get("/history", async (_req: Request, res: Response) => {
   }
 });
 
-export default router;
+module.exports = router;

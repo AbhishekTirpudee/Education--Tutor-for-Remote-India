@@ -1,30 +1,27 @@
 /**
  * Upload Routes
  * =============
- * POST /api/upload — Upload a PDF textbook, extract chunks, store in SQLite
- * GET  /api/textbooks — List all uploaded textbooks
  */
 
-import { Router, Request, Response } from "express";
-import multer from "multer";
-import path from "path";
-import { PrismaClient } from "@prisma/client";
-import { extractTextFromPdf, chunkPages, UPLOAD_DIR } from "../services/pdfProcessor";
+const express = require("express");
+const multer = require("multer");
+const { PrismaClient } = require("@prisma/client");
+const { extractTextFromPdf, chunkPages, UPLOAD_DIR } = require("../services/pdfProcessor");
 
-const router = Router();
+const router = express.Router();
 const prisma = new PrismaClient();
 
-// Multer config — store to disk
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
+  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
+  filename: (req, file, cb) => {
     const unique = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
     cb(null, unique);
   },
 });
+
 const upload = multer({
   storage,
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") cb(null, true);
     else cb(new Error("Only PDF files are accepted"));
   },
@@ -32,38 +29,35 @@ const upload = multer({
 });
 
 // POST /api/upload
-router.post("/upload", upload.single("pdf"), async (req: Request, res: Response) => {
+router.post("/upload", upload.single("pdf"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No PDF file uploaded" });
   }
 
-  const { subject, grade } = req.body as { subject?: string; grade?: string };
+  const { subject, grade } = req.body;
   const filePath = req.file.path;
 
   try {
-    // Extract + chunk the PDF
     const { pages, totalPages } = await extractTextFromPdf(filePath);
     const chunks = chunkPages(pages);
 
-    // Persist textbook record
     const textbook = await prisma.textbook.create({
       data: {
         filename: req.file.originalname,
-        subject: subject ?? null,
-        grade: grade ?? null,
+        subject: subject || null,
+        grade: grade || null,
         totalPages,
         totalChunks: chunks.length,
         filePath,
       },
     });
 
-    // Persist all chunks (batch insert)
     await prisma.textChunk.createMany({
       data: chunks.map((c) => ({
         textbookId: textbook.id,
         chunkIndex: c.chunkIndex,
         pageNumber: c.pageNumber,
-        chapter: c.chapter ?? null,
+        chapter: c.chapter || null,
         content: c.content,
         tokenCount: c.tokenCount,
       })),
@@ -83,7 +77,7 @@ router.post("/upload", upload.single("pdf"), async (req: Request, res: Response)
 });
 
 // GET /api/textbooks
-router.get("/textbooks", async (_req: Request, res: Response) => {
+router.get("/textbooks", async (req, res) => {
   try {
     const books = await prisma.textbook.findMany({
       orderBy: { createdAt: "desc" },
@@ -103,4 +97,4 @@ router.get("/textbooks", async (_req: Request, res: Response) => {
   }
 });
 
-export default router;
+module.exports = router;

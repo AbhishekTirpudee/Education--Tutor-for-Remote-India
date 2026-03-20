@@ -1,34 +1,22 @@
 /**
  * LLM Service
  * ===========
- * Sends pruned context to Google Gemini 1.5 Flash and returns the answer.
- * Falls back to a demo response if no API key is set.
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const SYSTEM_PROMPT = `You are a friendly, patient AI tutor helping students in rural India understand their textbooks.
 Answer ONLY based on the provided context. If the answer is not found, say so honestly.
 Keep answers clear, simple, and encouraging. Use relatable everyday Indian examples where possible.`;
 
-export interface LLMResponse {
-  answer: string;
-  inputTokens: number;
-  outputTokens: number;
-  latencyMs: number;
-}
-
-export async function askLLM(
-  question: string,
-  contextChunks: string[]
-): Promise<LLMResponse> {
+async function askLLM(question, contextChunks) {
   const context = contextChunks.join("\n\n---\n\n");
   const prompt = `Context from textbook:\n${context}\n\nStudent's Question: ${question}\n\nProvide a clear, curriculum-aligned answer based on the above context.`;
 
   const start = Date.now();
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!apiKey || apiKey === "your_gemini_api_key_here") {
     const latencyMs = Date.now() - start;
     return {
       answer:
@@ -66,3 +54,5 @@ export async function askLLM(
     };
   }
 }
+
+module.exports = { askLLM };
