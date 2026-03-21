@@ -57,7 +57,7 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`\n🎓 Education Tutor API running on http://localhost:${PORT}`);
   console.log(`📚 Context Pruning enabled — reducing tokens by ~78%`);
-  console.log(`🗃️  Database: SQLite (Prisma ORM)`);
+  console.log(`🗃️  Database: PostgreSQL (Prisma ORM)`);
   console.log(`\nEndpoints:`);
   console.log(`  GET  /api/health`);
   console.log(`  POST /api/upload   — Upload a textbook PDF`);

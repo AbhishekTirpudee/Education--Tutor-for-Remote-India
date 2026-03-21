@@ -1,6 +1,3 @@
-// This is your Prisma schema file
-// Docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,63 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── Models ────────────────────────────────────────────────────────────────────
-
 model Textbook {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   filename    String
   subject     String?
   grade       String?
-  totalPages  Int      @default(0)
-  totalChunks Int      @default(0)
+  totalPages  Int         @default(0)
+  totalChunks Int         @default(0)
   filePath    String
-  createdAt   DateTime @default(now())
-
-  chunks  TextChunk[]
-  queries QueryLog[]
+  createdAt   DateTime    @default(now())
+  queries     QueryLog[]
+  chunks      TextChunk[]
 }
 
 model TextChunk {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   textbookId Int
   chunkIndex Int
   pageNumber Int?
   chapter    String?
   content    String
-  tokenCount Int     @default(0)
-  // Stored as JSON string of float[]
+  tokenCount Int      @default(0)
   embedding  String?
-
-  textbook Textbook @relation(fields: [textbookId], references: [id], onDelete: Cascade)
+  textbook   Textbook @relation(fields: [textbookId], references: [id], onDelete: Cascade)
 }
 
 model QueryLog {
-  id         Int      @id @default(autoincrement())
-  textbookId Int?
-  question   String
-  answer     String?
-
-  // Pruning metrics
+  id              Int       @id @default(autoincrement())
+  textbookId      Int?
+  question        String
+  answer          String?
   totalChunks     Int?
   prunedChunks    Int?
-  reductionPct    Float?   // e.g. 78.4
-
-  // Token metrics
+  reductionPct    Float?
   baselineTokens  Int?
   prunedTokens    Int?
   tokensSaved     Int?
-
-  // Cost metrics (USD)
   baselineCostUsd Float?
   actualCostUsd   Float?
   costSavedUsd    Float?
-
-  // Latency ms
-  latencyMs Float?
-
-  createdAt DateTime @default(now())
-
-  textbook Textbook? @relation(fields: [textbookId], references: [id])
+  latencyMs       Float?
+  createdAt       DateTime  @default(now())
+  textbook        Textbook? @relation(fields: [textbookId], references: [id])
 }
 
 model TutoringSession {

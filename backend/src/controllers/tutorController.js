@@ -50,6 +50,10 @@ const askQuestion = async (req, res, next) => {
 
     return res.json({
       answer: llmResult.answer,
+      llmError: llmResult.errorType ? {
+        type: llmResult.errorType,
+        message: llmResult.errorMessage,
+      } : null,
       queryId: log.id,
       pruningMetrics: metrics,
       latencyMs: llmResult.latencyMs,
