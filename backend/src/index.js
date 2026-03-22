@@ -2,7 +2,7 @@
  * Express App Entry Point
  * =======================
  * Education Tutor for Remote India — Context Pruning System
- * Backend: Express.js + JavaScript + Prisma + SQLite
+ * Backend: Express.js + JavaScript + Prisma + PostgreSQL
  */
 
 require("dotenv").config();
