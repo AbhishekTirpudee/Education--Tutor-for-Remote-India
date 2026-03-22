@@ -23,7 +23,8 @@ const PORT = parseInt(process.env.PORT || "3001", 10);
 app.use(helmet());                      // Set security HTTP headers
 app.use(xss());                         // Prevent XSS attacks
 app.use(hpp());                         // Prevent HTTP Parameter Pollution
-app.use(cors({ origin: "http://localhost:5173" })); // Vite dev server
+// Allow requests from any origin (easiest for hackathon static frontend deployments)
+app.use(cors({ origin: "*" }));
 
 // Rate Limiting
 const limiter = rateLimit({
