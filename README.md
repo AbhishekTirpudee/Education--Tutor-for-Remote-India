@@ -105,7 +105,7 @@ Student Question
 | **Database / ORM** | PostgreSQL + Prisma ORM |
 | **PDF Processing** | `pdf-parse` |
 | **Pruning Engine** | `natural` (TF-IDF Cosine Similarity) |
-| **LLM Integration** | Google Gemini 1.5 Flash (`@google/generative-ai`) |
+| **LLM Integration** | Google Gemini 2.0 Flash (`@google/generative-ai`) |
 | **Security** | `helmet`, `xss-clean`, `hpp`, `express-rate-limit` |
 | **HTTP Client** | `axios` (frontend) |
 
