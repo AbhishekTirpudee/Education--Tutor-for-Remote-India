@@ -64,7 +64,7 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/textbooks — List textbooks`);
   console.log(`  POST /api/ask      — Ask a question (context pruning applied)`);
   console.log(`  GET  /api/metrics  — Token & cost savings`);
-  console.log(`  GET  /api/history  — Query history\n`);
+  console.log(`  GET  /api/history  — Query history (last 20 logs)\n`);
 });
 
 module.exports = app;

@@ -325,4 +325,4 @@ education-tutor/
 
 ---
 
-*Built with ❤️ by Team Reformers — JSPM's Rajashri Shahu College of Engineering, Tathawade, Pune.*
+*Built with ❤️ by **Team Reformers** — JSPM's Rajashri Shahu College of Engineering, Tathawade, Pune.*
