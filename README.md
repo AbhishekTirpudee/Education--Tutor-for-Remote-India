@@ -325,4 +325,19 @@ education-tutor/
 
 ---
 
-*Built with ❤️ by **Team Reformers** — JSPM's Rajashri Shahu College of Engineering, Tathawade, Pune.*
+*Built with ❤️ by Team Reformers — JSPM's Rajashri Shahu College of Engineering, Tathawade, Pune.*
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you'd like to improve this project:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-update`)
+3. Make your changes
+4. Commit your changes (`git commit -m "Added contribution section"`)
+5. Push to the branch (`git push origin feature-update`)
+6. Open a Pull Request
+
+---
