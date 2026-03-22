@@ -7,6 +7,7 @@ import { ChunksPanel } from './components/ChunksPanel';
 import { Toast } from './components/Toast';
 import { Textbook, GlobalMetrics, PruningMetrics } from './types';
 
+// Main Application Component
 function App() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);

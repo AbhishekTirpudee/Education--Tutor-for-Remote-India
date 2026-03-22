@@ -2,7 +2,7 @@
  * Express App Entry Point
  * =======================
  * Education Tutor for Remote India — Context Pruning System
- * Backend: Express.js + JavaScript + Prisma + SQLite
+ * Backend: Express.js + JavaScript + Prisma + PostgreSQL
  */
 
 require("dotenv").config();
@@ -23,7 +23,8 @@ const PORT = parseInt(process.env.PORT || "3001", 10);
 app.use(helmet());                      // Set security HTTP headers
 app.use(xss());                         // Prevent XSS attacks
 app.use(hpp());                         // Prevent HTTP Parameter Pollution
-app.use(cors({ origin: "http://localhost:5173" })); // Vite dev server
+// Allow requests from any origin (easiest for hackathon static frontend deployments)
+app.use(cors({ origin: "*" }));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -64,7 +65,7 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/textbooks — List textbooks`);
   console.log(`  POST /api/ask      — Ask a question (context pruning applied)`);
   console.log(`  GET  /api/metrics  — Token & cost savings`);
-  console.log(`  GET  /api/history  — Query history\n`);
+  console.log(`  GET  /api/history  — Query history (last 20 logs)\n`);
 });
 
 module.exports = app;
